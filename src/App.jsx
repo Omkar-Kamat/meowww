@@ -6,6 +6,7 @@ import Verify from "./auth/Verify";
 import ChatPage from "./pages/ChatPage";
 import { useAuthStore } from "./store/useAuthStore";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ToastContainer from "./components/ToastContainer";
 
 export default function App() {
     const fetchMe = useAuthStore((s) => s.fetchMe);
@@ -25,6 +26,7 @@ export default function App() {
 
     return (
         <BrowserRouter>
+            <ToastContainer />
             <Routes>
                 <Route path="/" element={<Navigate to="/chat" />} />
                 <Route path="/login" element={<Login />} />
