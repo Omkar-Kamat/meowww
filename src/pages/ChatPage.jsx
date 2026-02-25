@@ -51,6 +51,7 @@ export default function ChatPage() {
           await createOffer();
         }
       } catch (err) {
+        console.log(err)
         cleanup();
         setStatus("idle");
       }
