@@ -5,17 +5,61 @@ const api = axios.create({
   withCredentials: true,
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.response.use(
-  res => res,
-  async err => {
-    if (err.response?.status === 401) {
+  (res) => res,
+  async (err) => {
+    const originalRequest = err.config;
+
+    if (!err.response) {
+      return Promise.reject(err);
+    }
+
+    if (originalRequest.url.includes("/auth/refresh")) {
+      window.location.href = "/login";
+      return Promise.reject(err);
+    }
+
+    if (err.response.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: () => resolve(api(originalRequest)),
+            reject: (error) => reject(error),
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
         await api.post("/auth/refresh");
-        return api(err.config);
-      } catch {
+
+        processQueue(null);
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError);
         window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
+
     return Promise.reject(err);
   }
 );
