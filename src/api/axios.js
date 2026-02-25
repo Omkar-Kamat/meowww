@@ -10,11 +10,8 @@ let failedQueue = [];
 
 const processQueue = (error) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve();
-    }
+    if (error) prom.reject(error);
+    else prom.resolve();
   });
   failedQueue = [];
 };
@@ -28,8 +25,8 @@ api.interceptors.response.use(
       return Promise.reject(err);
     }
 
+    // Prevent recursion on refresh endpoint
     if (originalRequest.url.includes("/auth/refresh")) {
-      window.location.href = "/login";
       return Promise.reject(err);
     }
 
@@ -38,7 +35,7 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: () => resolve(api(originalRequest)),
-            reject: (error) => reject(error),
+            reject,
           });
         });
       }
@@ -48,12 +45,10 @@ api.interceptors.response.use(
 
       try {
         await api.post("/auth/refresh");
-
         processQueue(null);
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
-        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
