@@ -35,12 +35,24 @@ export default function ChatPage() {
         toggleVideo,
         isMuted,
         isVideoOff,
-        localStreamRef,
+        // localStreamRef,
     } = useWebRTC();
 
     // Keep latest WebRTC functions in refs so socket listeners never go stale
     const rtcRef = useRef({});
-    rtcRef.current = {
+
+    useEffect(() => {
+        rtcRef.current = {
+            createPeerConnection,
+            initLocalStream,
+            createOffer,
+            handleOffer,
+            handleAnswer,
+            handleIceCandidate,
+            cleanupPeer,
+            cleanupAll,
+        };
+    }, [
         createPeerConnection,
         initLocalStream,
         createOffer,
@@ -49,7 +61,7 @@ export default function ChatPage() {
         handleIceCandidate,
         cleanupPeer,
         cleanupAll,
-    };
+    ]);
 
     // ── Acquire camera + mic once on page load ──
     useEffect(() => {
@@ -207,15 +219,15 @@ export default function ChatPage() {
         socket.emit("search");
     };
 
-    const handleSkip = () => {
-        cleanupPeer();
-        if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = null;
-        }
-        socket.emit("skip");
-        setStatus("idle");
-        setMessages([]);
-    };
+    // const handleSkip = () => {
+    //     cleanupPeer();
+    //     if (remoteVideoRef.current) {
+    //         remoteVideoRef.current.srcObject = null;
+    //     }
+    //     socket.emit("skip");
+    //     setStatus("idle");
+    //     setMessages([]);
+    // };
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -227,8 +239,7 @@ export default function ChatPage() {
 
     const isConnecting =
         status === "matched" && connectionState !== "connected";
-    const isConnected =
-        status === "matched" && connectionState === "connected";
+    const isConnected = status === "matched" && connectionState === "connected";
 
     return (
         <div className="h-screen flex flex-col bg-neutral-950 text-white">
@@ -240,20 +251,22 @@ export default function ChatPage() {
                     <button
                         onClick={toggleMute}
                         disabled={!mediaReady}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${isMuted
-                            ? "bg-red-600 hover:bg-red-500"
-                            : "bg-neutral-800 hover:bg-neutral-700"
-                            } disabled:opacity-40`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                            isMuted
+                                ? "bg-red-600 hover:bg-red-500"
+                                : "bg-neutral-800 hover:bg-neutral-700"
+                        } disabled:opacity-40`}
                     >
                         {isMuted ? "🔇 Muted" : "🎤 Mic On"}
                     </button>
                     <button
                         onClick={toggleVideo}
                         disabled={!mediaReady}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${isVideoOff
-                            ? "bg-red-600 hover:bg-red-500"
-                            : "bg-neutral-800 hover:bg-neutral-700"
-                            } disabled:opacity-40`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                            isVideoOff
+                                ? "bg-red-600 hover:bg-red-500"
+                                : "bg-neutral-800 hover:bg-neutral-700"
+                        } disabled:opacity-40`}
                     >
                         {isVideoOff ? "📷 Cam Off" : "📹 Cam On"}
                     </button>
@@ -327,9 +340,13 @@ export default function ChatPage() {
                         />
                         {!remoteStream && (
                             <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm">
-                                {status === "idle" && "Click Search to find someone"}
-                                {status === "queued" && "Looking for a match..."}
-                                {status === "matched" && connectionState !== "connected" && "Connecting..."}
+                                {status === "idle" &&
+                                    "Click Search to find someone"}
+                                {status === "queued" &&
+                                    "Looking for a match..."}
+                                {status === "matched" &&
+                                    connectionState !== "connected" &&
+                                    "Connecting..."}
                             </div>
                         )}
                         <div className="absolute bottom-3 left-3 text-xs bg-black/60 px-3 py-1 rounded-lg">
@@ -341,7 +358,8 @@ export default function ChatPage() {
                     {stats && (
                         <div className="absolute bottom-4 right-4 text-xs bg-black/70 px-4 py-3 rounded-xl space-y-1 min-w-[140px]">
                             <div className="font-semibold">
-                                {stats.quality === "Excellent" && "🟢 Excellent"}
+                                {stats.quality === "Excellent" &&
+                                    "🟢 Excellent"}
                                 {stats.quality === "Good" && "🟡 Good"}
                                 {stats.quality === "Fair" && "🟠 Fair"}
                                 {stats.quality === "Poor" && "🔴 Poor"}
@@ -362,10 +380,11 @@ export default function ChatPage() {
                             {messages.map((msg, i) => (
                                 <div
                                     key={i}
-                                    className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${msg.fromSelf
-                                        ? "ml-auto bg-blue-600"
-                                        : "mr-auto bg-neutral-800"
-                                        }`}
+                                    className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${
+                                        msg.fromSelf
+                                            ? "ml-auto bg-blue-600"
+                                            : "mr-auto bg-neutral-800"
+                                    }`}
                                 >
                                     {msg.text}
                                 </div>
