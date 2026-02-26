@@ -7,7 +7,7 @@ export const useAuthStore = create((set) => ({
 
     fetchMe: async () => {
         try {
-            const { data } = await api.get("/auth/me");
+            const { data } = await api.get("/api/auth/me");
             set({ user: data, isAuthChecked: true });
         } catch {
             set({ user: null, isAuthChecked: true });
@@ -16,7 +16,7 @@ export const useAuthStore = create((set) => ({
 
     logout: async () => {
         try {
-            await api.post("/auth/logout");
+            await api.post("/api/auth/logout");
         } catch (err) {
             console.log(err);
         }
