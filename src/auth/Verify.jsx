@@ -37,36 +37,61 @@ export default function Verify() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-neutral-950 text-white">
-      <form
-        onSubmit={handleVerify}
-        className="bg-neutral-900 p-8 rounded-2xl w-96 flex flex-col gap-4"
-      >
-        <h2 className="text-2xl font-bold text-center">Verify Email</h2>
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#070F2B] to-[#1B1A55] text-white px-6">
 
-        <input
-          placeholder="Enter OTP"
-          className="p-3 rounded-lg bg-neutral-800 text-center tracking-widest text-lg"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          required
-        />
-
-        <button
-          disabled={loading}
-          className="bg-green-600 hover:bg-green-500 transition py-3 rounded-lg font-semibold"
-        >
-          {loading ? "Verifying..." : "Verify"}
-        </button>
-
-        <button
-          type="button"
-          onClick={handleResend}
-          className="text-sm text-neutral-400 hover:text-white"
-        >
-          Resend OTP
-        </button>
-      </form>
+    {/* Animated background blobs */}
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute w-[450px] h-[450px] bg-[#1B1A55] rounded-full blur-3xl opacity-40 -top-40 -left-40 animate-[float_24s_ease-in-out_infinite]" />
+      <div className="absolute w-[400px] h-[400px] bg-[#1B1A55] rounded-full blur-3xl opacity-30 bottom-0 right-0 animate-[float_30s_ease-in-out_infinite]" />
     </div>
-  );
+
+    <form
+      onSubmit={handleVerify}
+      className="relative z-10 w-full max-w-md backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl p-10 flex flex-col gap-6"
+    >
+      <div className="text-center">
+        <h2 className="text-3xl font-bold tracking-tight">
+          Verify Your Email
+        </h2>
+        <p className="text-[#C6C9FF] text-sm mt-2">
+          Enter the 6-digit code sent to your email
+        </p>
+      </div>
+
+      <input
+        placeholder="Enter OTP"
+        className="px-4 py-4 rounded-full bg-white/10 backdrop-blur text-center tracking-[0.4em] text-xl outline-none border border-white/10 focus:border-[#535C91] focus:ring-2 focus:ring-[#535C91]/40 transition"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        required
+      />
+
+      <button
+        disabled={loading}
+        className="mt-2 py-3 rounded-full bg-[#535C91] hover:bg-[#646EB0] transition-all duration-300 shadow-xl shadow-[#535C91]/40 font-semibold disabled:opacity-50"
+      >
+        {loading ? "Verifying..." : "Verify"}
+      </button>
+
+      <button
+        type="button"
+        onClick={handleResend}
+        className="text-sm text-[#C6C9FF] hover:text-white transition text-center mt-2"
+      >
+        Resend OTP
+      </button>
+    </form>
+
+    <style>
+      {`
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-30px); }
+          100% { transform: translateY(0px); }
+        }
+      `}
+    </style>
+
+  </div>
+);
 }

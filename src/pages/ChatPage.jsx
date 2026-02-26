@@ -242,37 +242,43 @@ export default function ChatPage() {
     const isConnected = status === "matched" && connectionState === "connected";
 
     return (
-        <div className="h-screen flex flex-col bg-neutral-950 text-white">
+        <div className="h-screen flex flex-col bg-gradient-to-b from-[#070F2B] to-[#1B1A55] text-white">
             {/* HEADER */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-neutral-800">
-                <span className="font-semibold">{user?.username}</span>
+            <div className="flex justify-between items-center px-8 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
+                <span className="font-semibold text-[#C6C9FF] tracking-wide">
+                    {user?.username}
+                </span>
+
                 <div className="flex items-center gap-3">
-                    {/* Mute / Video toggles always visible */}
                     <button
                         onClick={toggleMute}
                         disabled={!mediaReady}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                            isMuted
-                                ? "bg-red-600 hover:bg-red-500"
-                                : "bg-neutral-800 hover:bg-neutral-700"
-                        } disabled:opacity-40`}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+          ${
+              isMuted
+                  ? "bg-red-500/80 hover:bg-red-500"
+                  : "bg-white/10 hover:bg-white/20"
+          } disabled:opacity-40`}
                     >
-                        {isMuted ? "🔇 Muted" : "🎤 Mic On"}
+                        {isMuted ? "🔇 Muted" : "🎤 Mic"}
                     </button>
+
                     <button
                         onClick={toggleVideo}
                         disabled={!mediaReady}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                            isVideoOff
-                                ? "bg-red-600 hover:bg-red-500"
-                                : "bg-neutral-800 hover:bg-neutral-700"
-                        } disabled:opacity-40`}
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+          ${
+              isVideoOff
+                  ? "bg-red-500/80 hover:bg-red-500"
+                  : "bg-white/10 hover:bg-white/20"
+          } disabled:opacity-40`}
                     >
-                        {isVideoOff ? "📷 Cam Off" : "📹 Cam On"}
+                        {isVideoOff ? "📷 Off" : "📹 Cam"}
                     </button>
+
                     <button
                         onClick={logout}
-                        className="px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition text-sm"
+                        className="px-4 py-2 rounded-full bg-[#535C91] hover:bg-[#646EB0] transition shadow-lg shadow-[#535C91]/40 text-sm"
                     >
                         Logout
                     </button>
@@ -281,7 +287,7 @@ export default function ChatPage() {
 
             {/* CONNECTION STATUS */}
             {status === "matched" && (
-                <div className="text-center text-sm text-neutral-400 mt-2">
+                <div className="text-center text-sm text-[#C6C9FF] mt-2">
                     {connectionState === "connecting" && "Connecting..."}
                     {connectionState === "connected" && "Connected"}
                     {connectionState === "failed" && "Connection failed"}
@@ -289,25 +295,27 @@ export default function ChatPage() {
                 </div>
             )}
 
-            {/* MEDIA ERROR */}
+            {/* MEDIA ERROR — RESTORED */}
             {mediaError && (
-                <div className="text-center text-sm text-red-400 mt-2">
-                    ⚠️ {mediaError}
+                <div className="text-center mt-3">
+                    <div className="inline-block px-4 py-2 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-sm backdrop-blur">
+                        ⚠ {mediaError}
+                    </div>
                 </div>
             )}
 
-            {/* MAIN CONTENT */}
+            {/* MAIN */}
             <div className="flex-1 flex overflow-hidden">
                 {/* VIDEO GRID */}
-                <div className="relative flex-1 grid grid-cols-2 gap-4 p-6">
+                <div className="relative flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
                     {isConnecting && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-20">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-20">
                             <div className="animate-spin w-12 h-12 border-4 border-white border-t-transparent rounded-full" />
                         </div>
                     )}
 
-                    {/* LOCAL VIDEO — always visible */}
-                    <div className="relative bg-neutral-900 rounded-2xl overflow-hidden">
+                    {/* LOCAL VIDEO */}
+                    <div className="relative rounded-2xl overflow-hidden bg-black/40 backdrop-blur-md border border-white/10 shadow-xl">
                         <video
                             ref={localVideoRef}
                             autoPlay
@@ -315,54 +323,54 @@ export default function ChatPage() {
                             muted
                             className="w-full h-full object-cover"
                         />
-                        {isVideoOff && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm">
-                                Camera Off
-                            </div>
-                        )}
+
                         {!mediaReady && !mediaError && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-sm text-neutral-400">
+                            <div className="absolute inset-0 flex items-center justify-center text-[#C6C9FF]/70 text-sm">
                                 Starting camera...
                             </div>
                         )}
-                        <div className="absolute bottom-3 left-3 text-xs bg-black/60 px-3 py-1 rounded-lg">
+
+                        {isVideoOff && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-sm">
+                                Camera Off
+                            </div>
+                        )}
+
+                        <div className="absolute bottom-3 left-3 text-xs bg-black/60 px-3 py-1 rounded-full backdrop-blur">
                             You
                         </div>
                     </div>
 
                     {/* REMOTE VIDEO */}
-                    <div className="relative bg-neutral-900 rounded-2xl overflow-hidden">
+                    <div className="relative rounded-2xl overflow-hidden bg-black/40 backdrop-blur-md border border-white/10 shadow-xl">
                         <video
                             ref={remoteVideoRef}
                             autoPlay
                             playsInline
                             className="w-full h-full object-cover"
                         />
+
                         {!remoteStream && (
-                            <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm">
-                                {status === "idle" &&
-                                    "Click Search to find someone"}
+                            <div className="absolute inset-0 flex items-center justify-center text-[#C6C9FF]/70 text-sm">
+                                {status === "idle" && "Click Search to begin"}
                                 {status === "queued" &&
-                                    "Looking for a match..."}
+                                    "Looking for someone..."}
                                 {status === "matched" &&
                                     connectionState !== "connected" &&
                                     "Connecting..."}
                             </div>
                         )}
-                        <div className="absolute bottom-3 left-3 text-xs bg-black/60 px-3 py-1 rounded-lg">
+
+                        <div className="absolute bottom-3 left-3 text-xs bg-black/60 px-3 py-1 rounded-full backdrop-blur">
                             Stranger
                         </div>
                     </div>
 
                     {/* STATS */}
                     {stats && (
-                        <div className="absolute bottom-4 right-4 text-xs bg-black/70 px-4 py-3 rounded-xl space-y-1 min-w-[140px]">
-                            <div className="font-semibold">
-                                {stats.quality === "Excellent" &&
-                                    "🟢 Excellent"}
-                                {stats.quality === "Good" && "🟡 Good"}
-                                {stats.quality === "Fair" && "🟠 Fair"}
-                                {stats.quality === "Poor" && "🔴 Poor"}
+                        <div className="absolute bottom-6 right-8 text-xs bg-black/60 backdrop-blur px-4 py-3 rounded-xl border border-white/10 shadow-lg">
+                            <div className="font-semibold text-[#C6C9FF]">
+                                {stats.quality}
                             </div>
                             <div>Bitrate: {stats.bitrate} kbps</div>
                         </div>
@@ -371,19 +379,19 @@ export default function ChatPage() {
 
                 {/* CHAT PANEL */}
                 {isConnected && (
-                    <div className="w-80 flex flex-col border-l border-neutral-800">
-                        <div className="px-4 py-3 border-b border-neutral-800 text-sm font-semibold text-neutral-300">
+                    <div className="w-80 flex flex-col border-l border-white/10 backdrop-blur-md bg-white/5">
+                        <div className="px-4 py-3 border-b border-white/10 text-sm font-semibold text-[#C6C9FF]">
                             Chat
                         </div>
 
-                        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+                        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
                             {messages.map((msg, i) => (
                                 <div
                                     key={i}
-                                    className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${
+                                    className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${
                                         msg.fromSelf
-                                            ? "ml-auto bg-blue-600"
-                                            : "mr-auto bg-neutral-800"
+                                            ? "ml-auto bg-[#535C91] shadow-lg shadow-[#535C91]/40"
+                                            : "mr-auto bg-white/10"
                                     }`}
                                 >
                                     {msg.text}
@@ -394,17 +402,17 @@ export default function ChatPage() {
 
                         <form
                             onSubmit={handleSendMessage}
-                            className="p-3 border-t border-neutral-800 flex gap-2"
+                            className="p-3 border-t border-white/10 flex gap-2"
                         >
                             <input
                                 value={chatInput}
                                 onChange={(e) => setChatInput(e.target.value)}
                                 placeholder="Type a message..."
-                                className="flex-1 px-3 py-2 rounded-lg bg-neutral-800 text-sm outline-none focus:ring-1 focus:ring-neutral-600"
+                                className="flex-1 px-3 py-2 rounded-full bg-white/10 backdrop-blur text-sm outline-none focus:ring-1 focus:ring-[#535C91]"
                             />
                             <button
                                 type="submit"
-                                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-medium transition"
+                                className="px-4 py-2 rounded-full bg-[#535C91] hover:bg-[#646EB0] transition shadow-md shadow-[#535C91]/40 text-sm"
                             >
                                 Send
                             </button>
@@ -413,12 +421,12 @@ export default function ChatPage() {
                 )}
             </div>
 
-            {/* BOTTOM CONTROLS — all buttons always visible */}
-            <div className="p-4 border-t border-neutral-800 flex justify-center gap-4">
+            {/* BOTTOM CONTROLS */}
+            <div className="p-6 border-t border-white/10 backdrop-blur-md bg-white/5 flex justify-center gap-6">
                 <button
                     onClick={handleSearch}
                     disabled={status !== "idle" || !mediaReady}
-                    className="px-8 py-3 rounded-xl bg-green-600 hover:bg-green-500 transition font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-green-600"
+                    className="px-8 py-3 rounded-full bg-[#535C91] hover:bg-[#646EB0] transition shadow-xl shadow-[#535C91]/40 font-semibold disabled:opacity-30"
                 >
                     Search
                 </button>
@@ -429,7 +437,7 @@ export default function ChatPage() {
                         setStatus("idle");
                     }}
                     disabled={status !== "queued"}
-                    className="px-8 py-3 rounded-xl bg-yellow-600 hover:bg-yellow-500 transition font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-yellow-600"
+                    className="px-8 py-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition font-semibold disabled:opacity-30"
                 >
                     Stop
                 </button>
@@ -445,7 +453,7 @@ export default function ChatPage() {
                         setMessages([]);
                     }}
                     disabled={status !== "matched"}
-                    className="px-8 py-3 rounded-xl bg-neutral-700 hover:bg-neutral-600 transition font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-neutral-700"
+                    className="px-8 py-3 rounded-full bg-neutral-700 hover:bg-neutral-600 transition font-semibold disabled:opacity-30"
                 >
                     End
                 </button>
@@ -462,7 +470,7 @@ export default function ChatPage() {
                         socket.emit("search");
                     }}
                     disabled={status !== "matched"}
-                    className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-500 transition font-semibold disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-red-600"
+                    className="px-8 py-3 rounded-full bg-red-600 hover:bg-red-500 transition font-semibold disabled:opacity-30"
                 >
                     Skip
                 </button>
