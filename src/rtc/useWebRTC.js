@@ -69,18 +69,40 @@ export default function useWebRTC() {
     };
 
     const startStatsMonitoring = (peer) => {
-        statsIntervalRef.current = setInterval(async () => {
-            const report = await peer.getStats();
-            report.forEach((stat) => {
-                if (stat.type === "outbound-rtp" && stat.kind === "video") {
-                    setStats({
-                        bytesSent: stat.bytesSent,
-                        packetsSent: stat.packetsSent,
-                    });
-                }
-            });
-        }, 2000);
-    };
+  let lastBytes = 0;
+  let lastTimestamp = 0;
+
+  statsIntervalRef.current = setInterval(async () => {
+    const report = await peer.getStats();
+
+    report.forEach((stat) => {
+      if (stat.type === "outbound-rtp" && stat.kind === "video") {
+        if (lastTimestamp) {
+          const bitrate =
+            (8 * (stat.bytesSent - lastBytes)) /
+            (stat.timestamp - lastTimestamp);
+
+          const kbps = Math.floor(bitrate);
+
+          let quality = "Poor";
+
+          if (kbps > 1200) quality = "Excellent";
+          else if (kbps > 600) quality = "Good";
+          else if (kbps > 250) quality = "Fair";
+
+          setStats({
+            bitrate: kbps,
+            packetsSent: stat.packetsSent,
+            quality,
+          });
+        }
+
+        lastBytes = stat.bytesSent;
+        lastTimestamp = stat.timestamp;
+      }
+    });
+  }, 2000);
+};
 
     const initLocalStream = async () => {
         let stream;

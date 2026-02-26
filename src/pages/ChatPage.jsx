@@ -170,6 +170,17 @@ export default function ChatPage() {
                         Packets: {stats.packetsSent}
                     </div>
                 )}
+                {stats && (
+                    <div className="absolute bottom-4 right-4 text-xs bg-black/70 px-4 py-3 rounded-xl space-y-1 min-w-[140px]">
+                        <div className="font-semibold">
+                            {stats.quality === "Excellent" && "🟢 Excellent"}
+                            {stats.quality === "Good" && "🟡 Good"}
+                            {stats.quality === "Fair" && "🟠 Fair"}
+                            {stats.quality === "Poor" && "🔴 Poor"}
+                        </div>
+                        <div>Bitrate: {stats.bitrate} kbps</div>
+                    </div>
+                )}
             </div>
 
             {/* CONTROLS */}
