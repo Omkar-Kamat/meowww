@@ -17,7 +17,7 @@ export default function Verify() {
     setLoading(true);
 
     try {
-      await api.post("/auth/verify", { userId, otp });
+      await api.post("/api/auth/verify", { userId, otp });
       await fetchMe();
       navigate("/chat");
     } catch (err) {
@@ -29,7 +29,7 @@ export default function Verify() {
 
   const handleResend = async () => {
     try {
-      await api.post("/auth/resend-otp", { userId });
+      await api.post("/api/auth/resend-otp", { userId });
       alert("OTP resent");
     } catch (err) {
       alert(err.response?.data?.error);

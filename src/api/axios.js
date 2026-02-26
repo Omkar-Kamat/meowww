@@ -16,6 +16,18 @@ const processQueue = (error) => {
   failedQueue = [];
 };
 
+const shouldSkipRefresh = (url) => {
+  if (!url) return false;
+
+  return (
+    url.includes("/api/auth/login") ||
+    url.includes("/api/auth/signup") ||
+    url.includes("/api/auth/verify") ||
+    url.includes("/api/auth/resend-otp") ||
+    url.includes("/api/auth/refresh")
+  );
+};
+
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -25,12 +37,13 @@ api.interceptors.response.use(
       return Promise.reject(err);
     }
 
-    // Prevent recursion on refresh endpoint
-    if (originalRequest.url.includes("/auth/refresh")) {
-      return Promise.reject(err);
-    }
+    const status = err.response.status;
 
-    if (err.response.status === 401 && !originalRequest._retry) {
+    if (
+      status === 401 &&
+      !originalRequest._retry &&
+      !shouldSkipRefresh(originalRequest.url)
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -44,7 +57,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await api.post("/auth/refresh");
+        await api.post("/api/auth/refresh");
         processQueue(null);
         return api(originalRequest);
       } catch (refreshError) {

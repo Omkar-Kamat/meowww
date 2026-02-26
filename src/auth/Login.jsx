@@ -24,7 +24,7 @@ export default function Login() {
         e.preventDefault();
 
         try {
-            await api.post("/auth/login", form);
+            await api.post("/api/auth/login", form);
             await fetchMe();
             navigate("/chat");
         } catch (err) {
@@ -47,7 +47,7 @@ export default function Login() {
 
                 <input
                     name="email"
-                    type="email"
+                    type="text"
                     placeholder="Email"
                     className="p-3 rounded-lg bg-neutral-800"
                     onChange={handleChange}

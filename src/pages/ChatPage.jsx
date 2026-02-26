@@ -30,7 +30,9 @@ export default function ChatPage() {
         isMuted,
         isVideoOff,
     } = useWebRTC();
-
+    socket.on("connect", () => {
+        console.log("Socket connected:", socket.id);
+    });
     useEffect(() => {
         if (remoteVideoRef.current && remoteStream) {
             remoteVideoRef.current.srcObject = remoteStream;
@@ -88,6 +90,7 @@ export default function ChatPage() {
     }, []);
 
     const handleSearch = () => {
+        console.log("Emitting search...");
         setStatus("queued");
         socket.emit("search");
     };

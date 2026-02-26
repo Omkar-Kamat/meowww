@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useToastStore } from "../store/useToastStore";
 
 export default function Signup() {
     const navigate = useNavigate();
+    const show = useToastStore((s) => s.show);
 
     const [form, setForm] = useState({
         name: "",
@@ -37,11 +39,31 @@ export default function Signup() {
                 formData.append("profilePhoto", file);
             }
 
-            const res = await api.post("/auth/signup", formData);
+            const res = await api.post("/api/auth/signup", formData);
+
+            show(
+                "Account created. Check your email for verification.",
+                "success",
+            );
 
             navigate(`/verify?userId=${res.data.userId}`);
         } catch (err) {
-            alert(err.response?.data?.error || "Signup failed");
+            const code = err.response?.data?.code;
+
+            if (code === "EMAIL_EXISTS") {
+                show(
+                    "Email already registered. Try logging in instead.",
+                    "error",
+                );
+            } else if (code === "USERNAME_EXISTS") {
+                show("Username already taken. Choose another one.", "error");
+            } else {
+                show(
+                    err.response?.data?.error ||
+                        "Signup failed. Please try again.",
+                    "error",
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -100,7 +122,7 @@ export default function Signup() {
 
                 <button
                     disabled={loading}
-                    className="bg-green-600 hover:bg-green-500 transition py-3 rounded-lg font-semibold"
+                    className="bg-green-600 hover:bg-green-500 transition py-3 rounded-lg font-semibold disabled:opacity-60"
                 >
                     {loading ? "Creating..." : "Sign Up"}
                 </button>
